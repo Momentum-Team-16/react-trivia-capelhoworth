@@ -1,15 +1,10 @@
 import { useState, useEffect } from "react";
-// import { DateGreeting } from "./components/DateGreeting";
 import axios from "axios";
 import "./App.css";
+import he from "he";
+import shuffle from "lodash/shuffle";
 
 function App() {
-  // const [selectedCat, setSelectedCat] = useState("");
-  // if (selectedCat) {
-  //   // catId={selectedCat.id}
-  //   return <CatQuestion />;
-  // }
-
   return (
     <>
       <header>
@@ -17,7 +12,9 @@ function App() {
       </header>
       <main>
         <div className="App">
-          <Category />
+          <ul className="boxes">
+            <Category />
+          </ul>
         </div>
       </main>
     </>
@@ -26,7 +23,6 @@ function App() {
 
 function Category({ id, name }) {
   const [categories, setCategories] = useState([]);
-
   useEffect(() => {
     axios
       .get("https://opentdb.com/api_category.php")
@@ -39,15 +35,18 @@ function Category({ id, name }) {
 
   const [selectedCat, setSelectedCat] = useState("");
   if (selectedCat) {
-    // console.log(selectedCat);
     return <CatQuestion selectedCat={selectedCat} />;
   }
 
   return (
-    <div className="category">
+    <div>
       <ul>
         {categories.map(([catId, catName]) => (
-          <li onClick={() => setSelectedCat(catId)} key={catId}>
+          <li
+            className="category"
+            onClick={() => setSelectedCat(catId)}
+            key={catId}
+          >
             {catName}
           </li>
         ))}
@@ -58,29 +57,47 @@ function Category({ id, name }) {
 
 function CatQuestion({ selectedCat }) {
   const [question, setQuestion] = useState([]);
-  const incorrect_answers = question.incorrect_answers;
-  const correct_answer = question.correct_answer;
-  const newAnswersList = [(incorrect_answers, correct_answer)];
+  const [answer, setAnswer] = useState("");
+  const [score, setScore] = useState(0);
   useEffect(() => {
     axios
       .get(`https://opentdb.com/api.php?amount=1&category=${selectedCat}`)
       .then((res) => {
-        setQuestion(res.data.results);
+        setQuestion(
+          res.data.results.map((obj) => ({
+            question: he.decode(obj.question),
+            correctAnswer: obj.correct_answer,
+            answerChoices: shuffle([
+              obj.correct_answer,
+              ...obj.incorrect_answers,
+            ]),
+          }))
+        );
       });
   }, [selectedCat]);
+
+  if (answer) {
+    if (answer === question.correctAnswer) {
+      setScore(score + 1);
+    }
+    return <CatQuestion selectedCat={selectedCat} setScore={setScore} />;
+  }
 
   return (
     <div className="question">
       {question.map((quest) => (
         <div key={selectedCat}>
-          <h1>
-            {quest.question
-              .replace("&quot;", '"')
-              .replace("&quot;", '"')
-              .replace("&#039;", "'")}
-          </h1>
-          <ul>
-            <li>{console.log(newAnswersList)}</li>
+          <h1>{quest.question}</h1>
+          <ul className="answers" key={quest}>
+            {quest.answerChoices.map((a) => (
+              <li
+                className="answer-choices"
+                onClick={() => setAnswer(he.decode(a))}
+                key={a}
+              >
+                {he.decode(a)}
+              </li>
+            ))}
           </ul>
         </div>
       ))}

@@ -46,3 +46,29 @@
 .Header {
   text-align: center;
 }
+
+.category {
+  text-align: center;
+  list-style: none;
+  border: solid 1px rgb(197, 96, 130);
+  margin: 5px;
+  padding: 5px;
+}
+
+.answers {
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.answer-choices {
+  text-align: center;
+  list-style: none;
+  border: solid 1px rgb(197, 96, 130);
+  margin: 2px;
+  padding: 2px;
+}
+
+.question {
+  text-align: center;
+}
