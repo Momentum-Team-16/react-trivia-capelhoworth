@@ -45,7 +45,7 @@ function Category({ id, name }) {
         />
         <div>
           <p></p>
-          <p>Score = {score}</p>
+          <h2>Score = {score}</h2>
         </div>
       </>
     );

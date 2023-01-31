@@ -56,6 +56,10 @@
   background-color: lightgoldenrodyellow;
 }
 
+.category:hover {
+  background-color: aquamarine;
+}
+
 .answers {
   display: grid;
   grid-template-rows: repeat(2, 1fr);
