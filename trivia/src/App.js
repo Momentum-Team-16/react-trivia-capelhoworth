@@ -22,6 +22,10 @@ function App() {
 }
 
 function Category({ id, name }) {
+  const [score, setScore] = useState(0);
+  const updateScore = (amount) => {
+    setScore(score + amount);
+  };
   const [categories, setCategories] = useState([]);
   useEffect(() => {
     axios
@@ -35,7 +39,16 @@ function Category({ id, name }) {
 
   const [selectedCat, setSelectedCat] = useState("");
   if (selectedCat) {
-    return <CatQuestion selectedCat={selectedCat} />;
+    return (
+      <>
+        <CatQuestion selectedCat={selectedCat} changeScore={updateScore} />
+        <div>
+          <p></p>
+          <p>Score = {score}</p>
+          {/* <Score currentScore={score} /> */}
+        </div>
+      </>
+    );
   }
 
   return (
@@ -55,13 +68,12 @@ function Category({ id, name }) {
   );
 }
 
-function CatQuestion({ selectedCat }) {
+function CatQuestion({ selectedCat, changeScore }) {
   const [question, setQuestion] = useState([]);
-  const [answer, setAnswer] = useState("");
-  const [score, setScore] = useState(0);
+  const [index, setIndex] = useState(0);
   useEffect(() => {
     axios
-      .get(`https://opentdb.com/api.php?amount=1&category=${selectedCat}`)
+      .get(`https://opentdb.com/api.php?amount=10&category=${selectedCat}`)
       .then((res) => {
         setQuestion(
           res.data.results.map((obj) => ({
@@ -76,33 +88,51 @@ function CatQuestion({ selectedCat }) {
       });
   }, [selectedCat]);
 
-  if (answer) {
-    if (answer === question.correctAnswer) {
-      setScore(score + 1);
-    }
-    return <CatQuestion selectedCat={selectedCat} setScore={setScore} />;
-  }
+  return (
+    question.length > 0 && (
+      <Question question={question} index={index} setIndex={setIndex} />
+    )
+  );
+}
 
+function Question({ question, index, setIndex }) {
+  function handleClick() {
+    setIndex(index + 1);
+  }
+  const [answer, setAnswer] = useState("");
   return (
     <div className="question">
-      {question.map((quest) => (
-        <div key={selectedCat}>
-          <h1>{quest.question}</h1>
-          <ul className="answers" key={quest}>
-            {quest.answerChoices.map((a) => (
-              <li
-                className="answer-choices"
-                onClick={() => setAnswer(he.decode(a))}
-                key={a}
-              >
-                {he.decode(a)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      <div key={index}>
+        <h1>{question[index].question}</h1>
+        <ul className="answers" key={question}>
+          {question[index].answerChoices.map((a) => (
+            <li
+              className="answer-choices"
+              onClick={() => setAnswer(he.decode(a))}
+              key={a}
+            >
+              {he.decode(a)}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p>
+        <button onClick={() => handleClick()}>Submit</button>
+      </p>
     </div>
   );
 }
+
+// function submitButton {
+//   console.log(question[0].correctAnswer);
+//   if (answer === question[0].correctAnswer) {
+//     changeScore(1);
+//     return <CatQuestion selectedCat={selectedCat} changeScore={changeScore} />;
+//   }
+// }
+
+// const Score = ({ currentScore }) => {
+//   return <div> Score = {currentScore}</div>;
+// };
 
 export default App;
