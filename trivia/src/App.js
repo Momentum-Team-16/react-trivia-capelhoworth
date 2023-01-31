@@ -7,9 +7,6 @@ import shuffle from "lodash/shuffle";
 function App() {
   return (
     <>
-      <header>
-        <h1 className="Header">Trivia Categories!</h1>
-      </header>
       <main>
         <div className="App">
           <ul className="boxes">
@@ -41,11 +38,14 @@ function Category({ id, name }) {
   if (selectedCat) {
     return (
       <>
-        <CatQuestion selectedCat={selectedCat} changeScore={updateScore} />
+        <CatQuestion
+          selectedCat={selectedCat}
+          changeScore={updateScore}
+          setSelectedCat={setSelectedCat}
+        />
         <div>
           <p></p>
           <p>Score = {score}</p>
-          {/* <Score currentScore={score} /> */}
         </div>
       </>
     );
@@ -53,6 +53,9 @@ function Category({ id, name }) {
 
   return (
     <div>
+      <header>
+        <h1 className="Header">Trivia Categories!</h1>
+      </header>
       <ul>
         {categories.map(([catId, catName]) => (
           <li
@@ -68,7 +71,7 @@ function Category({ id, name }) {
   );
 }
 
-function CatQuestion({ selectedCat, changeScore }) {
+function CatQuestion({ selectedCat, changeScore, setSelectedCat }) {
   const [question, setQuestion] = useState([]);
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -90,16 +93,31 @@ function CatQuestion({ selectedCat, changeScore }) {
 
   return (
     question.length > 0 && (
-      <Question question={question} index={index} setIndex={setIndex} />
+      <Question
+        question={question}
+        index={index}
+        setIndex={setIndex}
+        setSelectedCat={setSelectedCat}
+        changeScore={changeScore}
+      />
     )
   );
 }
 
-function Question({ question, index, setIndex }) {
+function Question({ question, index, setIndex, setSelectedCat, changeScore }) {
+  const [answer, setAnswer] = useState("");
   function handleClick() {
+    if (he.decode(answer) === question[index].correctAnswer) {
+      changeScore(1);
+      console.log("Success!");
+    }
     setIndex(index + 1);
   }
-  const [answer, setAnswer] = useState("");
+  if (question && index > question.length - 1) {
+    return (
+      <FinalPage setSelectedCat={setSelectedCat} changeScore={changeScore} />
+    );
+  }
   return (
     <div className="question">
       <div key={index}>
@@ -123,16 +141,13 @@ function Question({ question, index, setIndex }) {
   );
 }
 
-// function submitButton {
-//   console.log(question[0].correctAnswer);
-//   if (answer === question[0].correctAnswer) {
-//     changeScore(1);
-//     return <CatQuestion selectedCat={selectedCat} changeScore={changeScore} />;
-//   }
-// }
-
-// const Score = ({ currentScore }) => {
-//   return <div> Score = {currentScore}</div>;
-// };
+function FinalPage({ index, question, setSelectedCat }) {
+  return (
+    <div>
+      <h1>Quiz Complete!</h1>
+      <button onClick={() => setSelectedCat(null)}>Restart Game</button>
+    </div>
+  );
+}
 
 export default App;

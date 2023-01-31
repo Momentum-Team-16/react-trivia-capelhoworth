@@ -50,9 +50,10 @@
 .category {
   text-align: center;
   list-style: none;
-  border: solid 1px rgb(197, 96, 130);
+  border: solid 3px rgb(197, 96, 130);
   margin: 5px;
   padding: 5px;
+  background-color: lightgoldenrodyellow;
 }
 
 .answers {
@@ -71,4 +72,12 @@
 
 .question {
   text-align: center;
+}
+
+.answer-choices {
+  background-color: lightgoldenrodyellow;
+}
+
+.answer-choices:active {
+  background-color: aquamarine;
 }
